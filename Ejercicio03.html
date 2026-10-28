@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Personajes - Dragon Ball API</title>
+  <link rel="stylesheet" href="estilos3.css">
+</head>
+<body>
+
+  <div class="card-container">
+    <h1>Buscador Dragon Ball API</h1>
+    
+    <!-- CAP1: Estructura html -->
+    <form action="" id="formBuscador">
+      <div class="field-box">
+        <label for="idpersonaje">ID del Personaje:</label>
+        <input type="text" id="idpersonaje" placeholder="Ej. 1, 2, 3..." required>
+        <button type="submit">Buscar Personaje</button>
+      </div>
+
+      <div class="field-box">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="descripcion">Descripción:</label>
+        <textarea id="descripcion" rows="4" readonly></textarea>
+      </div>
+    </form>
+
+    <div class="image-container">
+      <label>Imagen:</label>
+      <div class="img-preview">
+        <img id="imagenPersonaje" src="" alt="Imagen del personaje aparecerá aquí">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //CAP2: LAS REFERENCIAS Y EVENTO SUBMIT
+    const formulario = document.getElementById('formBuscador');
+    const idPersonaje = document.getElementById('idpersonaje');
+    const nombre = document.getElementById('nombre');
+    const descripcion = document.getElementById('descripcion');
+    const imagenPersonaje = document.getElementById('imagenPersonaje');
+
+    formulario.addEventListener("submit", (event) => {
+      event.preventDefault();
+      obtenerPersonajeDB(idPersonaje.value); 
+    });
+
+    //CAP3: FUNCIÓN ASINCRONA
+    async function obtenerPersonajeDB(id) {
+      const API_URL = `https://dragonball-api.com/api/characters/${id}`;
+
+      try {
+        const respuesta = await fetch(API_URL);
+
+        if (!respuesta.ok) {
+          if (respuesta.status === 404) {
+            nombre.value = '';
+            descripcion.value = '';
+            imagenPersonaje.src = '';
+            imagenPersonaje.alt = 'No encontrado';
+            alert('¡El ID del personaje de Dragon Ball no existe!');
+          }
+          throw new Error('Error de comunicación con la API de Dragon Ball');
+        }
+
+        const datos = await respuesta.json();
+
+        //CAP4: ASIGNACION DE LOS 5 CAMPOS AL FORMULARIO
+        nombre.value = datos.name;              
+        descripcion.value = datos.description;  
+        imagenPersonaje.src = datos.image;      
+        imagenPersonaje.alt = datos.name;       
+      } catch (e) {
+        console.error("Ocurrió un error en la búsqueda:", e);
+      }
+    }
+  </script>
+</body>
+</html>

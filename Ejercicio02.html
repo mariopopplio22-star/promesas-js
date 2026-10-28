@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Naves - SWAPI</title>
+  <link rel="stylesheet" href="estilos2.css">
+</head>
+<body>
+
+  <div class="card-container">
+    <h1>Buscador de Naves Espaciales</h1>
+    
+    <!-- CAP1: Estructura html -->
+    <form action="" id="formBuscador">
+      <div class="field-box">
+        <label for="idnave">ID de la Nave:</label>
+        <input type="text" id="idnave" placeholder="Ej. 9, 3, 10..." required>
+        <button type="submit">Consultar Nave</button>
+      </div>
+
+      <div class="field-box">
+        <label for="nombre">Nombre de la Nave:</label>
+        <input type="text" id="nombre" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="modelo">Modelo:</label>
+        <input type="text" id="modelo" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="fabricante">Fabricante:</label>
+        <input type="text" id="fabricante" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="costo">Costo (Créditos):</label>
+        <input type="text" id="costo" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="clase">Clase de Nave:</label>
+        <input type="text" id="clase" readonly>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    //CAP2: LAS REFERENCIAS Y EVENTO SUBMIT
+    const formulario = document.getElementById('formBuscador');
+    const idNave = document.getElementById('idnave');
+    const nombre = document.getElementById('nombre');
+    const modelo = document.getElementById('modelo');
+    const fabricante = document.getElementById('fabricante');
+    const costo = document.getElementById('costo');
+    const clase = document.getElementById('clase');
+
+    formulario.addEventListener("submit", (event) => {
+      event.preventDefault(); 
+      obtenerNave(idNave.value); 
+    });
+
+    //CAP3: FUNCIÓN ASINCRONA
+    async function obtenerNave(id) {
+      const API_URL = `https://swapi.dev/api/starships/${id}/`;
+
+      try {
+        const respuesta = await fetch(API_URL);
+
+        if (!respuesta.ok) {
+          if (respuesta.status === 404) {
+            nombre.value = '';
+            modelo.value = '';
+            fabricante.value = '';
+            costo.value = '';
+            clase.value = '';
+            alert('¡La nave espacial ingresada no existe!');
+          }
+          throw new Error('Error de comunicación al buscar la nave');
+        }
+
+        const datos = await respuesta.json();
+
+        //CAP4: ASIGNACION DE LOS 5 CAMPOS AL FORMULARIO
+        nombre.value = datos.name;              
+        modelo.value = datos.model;             
+        fabricante.value = datos.manufacturer;  
+        costo.value = datos.cost_in_credits;   
+        clase.value = datos.starship_class;     
+
+      } catch (e) {
+        console.error("Error en la solicitud:", e);
+      }
+    }
+  </script>
+</body>
+</html>

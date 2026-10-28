@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Pokémon - PokéAPI</title>
+  <link rel="stylesheet" href="estilos4.css">
+</head>
+<body>
+
+  <div class="card-container">
+    <h1>Buscador PokéAPI</h1>
+    
+    <!-- CAP1: Estructura html -->
+    <form action="" id="formBuscador">
+      <div class="field-box">
+        <label for="idpokemon">ID o Nombre del Pokémon:</label>
+        <input type="text" id="idpokemon" placeholder="Ej. 1, 25, pikachu..." required>
+        <button type="submit">Buscar Pokémon</button>
+      </div>
+
+      <div class="field-box">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="tipo">Tipo Principal:</label>
+        <input type="text" id="tipo" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="altura">Altura:</label>
+        <input type="text" id="altura" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="peso">Peso:</label>
+        <input type="text" id="peso" readonly>
+      </div>
+
+      <div class="field-box">
+        <label for="experiencia">Experiencia Base:</label>
+        <input type="text" id="experiencia" readonly>
+      </div>
+    </form>
+
+    <div class="image-container">
+      <label>Sprite Oficial:</label>
+      <div class="img-preview">
+        <img id="imagenPokemon" src="" alt="Sprite del Pokémon aparecerá aquí">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //CAP2: LAS REFERENCIAS Y EVENTO SUBMIT
+    const formulario = document.getElementById('formBuscador');
+    const idPokemon = document.getElementById('idpokemon');
+    const nombre = document.getElementById('nombre');
+    const tipo = document.getElementById('tipo');
+    const altura = document.getElementById('altura');
+    const peso = document.getElementById('peso');
+    const experiencia = document.getElementById('experiencia');
+    const imagenPokemon = document.getElementById('imagenPokemon');
+
+    formulario.addEventListener("submit", (event) => {
+      event.preventDefault(); 
+      obtenerPokemon(idPokemon.value.toLowerCase().trim()); 
+    });
+
+    //CAP3: FUNCIÓN ASINCRONA
+    async function obtenerPokemon(id) {
+      const API_URL = `https://pokeapi.co/api/v2/pokemon/${id}`;
+
+      try {
+        const respuesta = await fetch(API_URL);
+
+        if (!respuesta.ok) {
+          if (respuesta.status === 404) {
+            nombre.value = '';
+            tipo.value = '';
+            altura.value = '';
+            peso.value = '';
+            experiencia.value = '';
+            imagenPokemon.src = '';
+            imagenPokemon.alt = 'No encontrado';
+            alert('¡El Pokémon ingresado no existe!');
+          }
+          throw new Error('Error de comunicación con la PokéAPI');
+        }
+
+        const datos = await respuesta.json();
+
+        //CAP4: ASIGNACION DE LOS 5 CAMPOS AL FORMULARIO
+        nombre.value = datos.name;                                    
+        tipo.value = datos.types[0].type.name;                       
+        altura.value = datos.height;                                  
+        peso.value = datos.weight;                                    
+        experiencia.value = datos.base_experience;                    
+        
+        imagenPokemon.src = datos.sprites.other['official-artwork'].front_default;
+        imagenPokemon.alt = datos.name;
+
+      } catch (e) {
+        console.error("Ocurrió un error en la búsqueda del Pokémon:", e);
+      }
+    }
+  </script>
+</body>
+</html>

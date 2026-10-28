@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Planetas - SWAPI</title>
+  <link rel="stylesheet" href="estilos1.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Buscador de Planetas Star Wars</h1>
+    
+    <!-- CAP1: Estructura html -->
+    <form action="" id="formBuscador">
+      <div class="search-box">
+        <label for="idplaneta">ID del Planeta:</label>
+        <input type="text" id="idplaneta" placeholder="Ej. 1" required>
+        <button type="submit">Buscar</button>
+      </div>
+
+      <div class="input-group">
+        <label for="nombre">Nombre del Planeta:</label>
+        <input type="text" id="nombre" readonly>
+      </div>
+
+      <div class="input-group">
+        <label for="clima">Clima:</label>
+        <input type="text" id="clima" readonly>
+      </div>
+
+      <div class="input-group">
+        <label for="terreno">Terreno:</label>
+        <input type="text" id="terreno" readonly>
+      </div>
+
+      <div class="input-group">
+        <label for="poblacion">Población:</label>
+        <input type="text" id="poblacion" readonly>
+      </div>
+
+      <div class="input-group">
+        <label for="diametro">Diámetro:</label>
+        <input type="text" id="diametro" readonly>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    //CAP2: LAS REFERENCIAS Y EVENTO SUBMIT
+    const formulario = document.getElementById('formBuscador');
+    const idPlaneta = document.getElementById('idplaneta');
+    const nombre = document.getElementById('nombre');
+    const clima = document.getElementById('clima');
+    const terreno = document.getElementById('terreno');
+    const poblacion = document.getElementById('poblacion');
+    const diametro = document.getElementById('diametro');
+
+    formulario.addEventListener("submit", (event) => {
+      event.preventDefault(); 
+      obtenerPlaneta(idPlaneta.value); 
+    });
+
+    //CAP3: FUNCIÓN ASINCRONA
+    async function obtenerPlaneta(id){
+      const API_URL = `https://swapi.dev/api/planets/${id}/`;
+
+      try {
+       
+        const respuesta = await fetch(API_URL);
+        
+        if (!respuesta.ok) {  
+          if (respuesta.status === 404){
+            nombre.value = '';
+            clima.value = '';
+            terreno.value = '';
+            poblacion.value = '';
+            diametro.value = '';
+            alert('Este planeta no existe');
+          }
+          throw new Error('Error de comunicación con la API');
+        }
+        const datos = await respuesta.json();
+
+        //CAP4: ASIGNACION DE LOS 5 CAMPOS AL FORMULARIO
+        nombre.value = datos.name;          
+        clima.value = datos.climate;        
+        terreno.value = datos.terrain;      
+        poblacion.value = datos.population;
+        diametro.value = datos.diameter;    
+
+      } catch (e) {
+        console.error("Ocurrió un error:", e);
+      }
+    }
+  </script>
+</body>
+</html>
